@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("ScriptRunner")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ChronicCareIQ")]
+[assembly: AssemblyCompany("Buck The Odds, LLC")]
 [assembly: AssemblyProduct("ScriptRunner")]
-[assembly: AssemblyCopyright("Copyright ChronicCareIQ 2013-2018")]
+[assembly: AssemblyCopyright("Forked from https://github.com/mcintyre321/SimpleScriptRunner")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("fa345779-1917-40e9-bb8f-9bff6bd27e4b")]
+[assembly: Guid("4e1593b9-d7f9-4c74-a5e7-04ac14770b36")]
 
 // Version information for an assembly consists of the following four values:
 //
