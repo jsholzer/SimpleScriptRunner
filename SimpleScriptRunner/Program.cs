@@ -1,54 +1,69 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SimpleScriptRunner.MsSql;
+using SimpleScriptRunner.MySql;
 
 namespace SimpleScriptRunner
 {
     public class Program
     {
-        #region Category enum
-
         public enum Category
         {
             error,
             warning
         }
 
-        #endregion
-
-        public static int Main(string[] argArray)
+        public static int originalMain(string[] argArray)
         {
             try
             {
-                IEnumerable<string> optional = argArray.Where(a => a.StartsWith("-"));
-                var required = argArray.Where(a => !a.StartsWith("-")).ToArray();
-                var requireRollback = optional.Any(a => a == "-requirerollback");
-                var useTransactions = optional.Any(a => a == "-usetransactions");
-
-                if (required.Count() == 3) Execute(required[0], required[1], required.Last(), useTransactions, requireRollback);
-                else Execute(required[0], required[1], required.Last(), useTransactions, requireRollback, required[2], required[3]);
+                Options options = Options.build(argArray);
+                executeRelease(options.Params[0], options.Params[1], options, options.Params.Last(), options.Params[2], options.Params[3]);
                 return 0;
             }
             catch (Exception ex)
             {
                 WriteMessage(Assembly.GetExecutingAssembly().FullName, string.Empty, Category.error, "1", ex.ToString());
-                return 1; //see https://msdn.microsoft.com/en-us/library/0fwzzxz2.aspx
+                return 1;
             }
         }
 
-        public static void Execute(string serverName, string databaseName, string path = ".", bool useTransactions = false, bool requireRollback = false, string username = null, string password = null)
+        public static void executeRelease(string serverName, string databaseName, Options options, string path = ".", string username = null, string password = null)
         {
-            var scriptTarget = (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
-                                   ? new SqlDatabase(serverName, databaseName, username, password)
-                                   : new SqlDatabase(serverName, databaseName);
-            foreach (var releaseDirectoryPath in Directory.GetDirectories(path, "Release *"))
+            SqlDatabase scriptTarget = !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) ?
+                new SqlDatabase(serverName, databaseName, username, password) :
+                new SqlDatabase(serverName, databaseName);
+
+            ScriptVersion currentVersion = scriptTarget.CurrentVersion;                                                     // only reads version once and relies on scripts executing in proper order
+            foreach (String releaseDirectoryPath in Directory.GetDirectories(path, "Release *"))
             {
-                var scriptSource = new FolderContainingNumberedSqlScripts(releaseDirectoryPath, "*.sql");
-                var updater = new Updater<ITextScriptTarget>(scriptSource, scriptTarget, requireRollback, useTransactions);
-                updater.ApplyScripts();
+                IScriptSource<ITextScriptTarget> scriptSource = new FolderContainingNumberedSqlScripts(releaseDirectoryPath, "*.sql");
+                Updater updater = new Updater(scriptSource, scriptTarget, options);
+                updater.applyScripts(currentVersion);
+            }
+        }
+
+        public static int executeSqlFile(string path, string serverName, string databaseName, Options options, string username = null, string password = null)
+        {
+            try
+            {
+                SqlDatabase scriptTarget = !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) ?
+                    new SqlDatabase(serverName, databaseName, username, password) :
+                    new SqlDatabase(serverName, databaseName);
+
+                options.SkipVersion = true;         // turns off setting patch version since file is free form sql
+
+                FileInfo file = new FileInfo(path);
+                IScript<ITextScriptTarget> script = new NumberedTextScript(file, 0, 0, 0, "");
+                script.apply(scriptTarget, options);
+
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                WriteMessage(Assembly.GetExecutingAssembly().FullName, string.Empty, Category.error, "1", ex.ToString());
+                return 1;
             }
         }
 

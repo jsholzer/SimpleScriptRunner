@@ -17,3 +17,5 @@ LPRun.5.1.ReSharper.user
 LPRun.suo
 LPRun.5.1.ReSharper.user
 *.user
+.vs
+packages

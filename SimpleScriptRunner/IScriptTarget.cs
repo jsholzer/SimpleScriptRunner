@@ -1,6 +1,6 @@
 namespace SimpleScriptRunner
 {
-	interface IScriptTarget
+	public interface IScriptTarget
 	{
 		ScriptVersion CurrentVersion { get; }
 	}

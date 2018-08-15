@@ -1,7 +1,8 @@
 namespace SimpleScriptRunner
 {
-	interface ITextScriptTarget : IScriptTarget
+	public interface ITextScriptTarget : IScriptTarget
 	{
-		void Apply(string content, ScriptVersion version);
-	}
+        void apply(string content);
+        void updateVersion(ScriptVersion version);
+    }
 }

@@ -1,40 +1,60 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace SimpleScriptRunner
 {
-	class Updater<T> where T:IScriptTarget
-	{
-		private readonly IScriptSource<T> scriptSource;
-		private readonly T scriptTarget;
-	    private readonly bool _requireRollback;
-	    private readonly bool _useTransactions;
+    public class Updater 
+    {
+        private readonly IScriptSource<ITextScriptTarget> scriptSource;
+        private readonly ITextScriptTarget scriptTarget;
+        private readonly Options options;
 
-	    public Updater(IScriptSource<T> scriptSource, T scriptTarget, bool requireRollback, bool useTransactions)
-		{
-			this.scriptSource = scriptSource;
-			this.scriptTarget = scriptTarget;
-		    _requireRollback = requireRollback;
-	        _useTransactions = useTransactions;
-		}
+        public Updater(IScriptSource<ITextScriptTarget> scriptSource, ITextScriptTarget scriptTarget, Options options)
+        {
+            this.scriptSource = scriptSource;
+            this.scriptTarget = scriptTarget;
+            this.options = options;
+        }
 
+        private static readonly List<int> skippedMajor = new List<int>();
+        private static readonly List<int> skippedMinor = new List<int>();
 
-		internal void ApplyScripts()
-		{
-			var currentVersion = scriptTarget.CurrentVersion;
-			foreach (var script in scriptSource.Scripts)
-			{
-				if (script.Version.CompareTo(currentVersion) > 0)
-				{
-					Console.WriteLine("Running: " + script.ToString());
-                    script.Apply(scriptTarget, _requireRollback, _useTransactions);
-					currentVersion = scriptTarget.CurrentVersion;
-				}else
-				{
-					Console.WriteLine("Skipping: " + script.ToString());
-					
-				}
-			}
-		}
-	}
+        public void applyScripts(ScriptVersion currentVersion)
+        {
+            foreach (IScript<ITextScriptTarget> script in scriptSource.Scripts)
+            {
+                if (script.Version.Major < currentVersion.Major)
+                {
+                    if (skippedMajor.Contains(script.Version.Major))
+                        continue;
+
+                    skippedMajor.Add(script.Version.Major);
+                    Console.WriteLine("Skipping release: {0}.x", script.Version.Major);
+                }
+                else if (script.Version.Major == currentVersion.Major && script.Version.Minor < currentVersion.Minor)
+                {
+                    if (skippedMinor.Contains(script.Version.Minor))
+                        continue;
+
+                    skippedMinor.Add(script.Version.Minor);
+                    Console.WriteLine("Skipping release: {0}.{1}", script.Version.Major, script.Version.Minor);
+                }
+                else if (script.Version.compareIgnoreDate(currentVersion) <= 0)
+                {
+                    Console.WriteLine("Skipping patch: {0}", script);
+                }
+                else if (options.MaxPatch != null && script.Version.Patch > options.MaxPatch.Value)
+                {
+                    Console.WriteLine("Stopping at maximum patch {0}", options.MaxPatch);
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("Running: {0}", script);
+                    script.apply(scriptTarget, options);
+                    currentVersion = scriptTarget.CurrentVersion;
+                }
+            }
+        }
+    }
 }

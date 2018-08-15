@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SimpleScriptRunner")]
-[assembly: AssemblyDescription("Command line tool for updating database schema from numbered scripts, supports rollback, release folders, idempotency checks, and above all - it's simple! - https://github.com/mcintyre321/SimpleScriptRunner")]
+[assembly: AssemblyTitle("ScriptRunner")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("SimpleScriptRunner")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2012")]
+[assembly: AssemblyCompany("ChronicCareIQ")]
+[assembly: AssemblyProduct("ScriptRunner")]
+[assembly: AssemblyCopyright("Copyright ChronicCareIQ 2013-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ade2dbc6-dc8b-4f43-841c-e611fa102a3f")]
+[assembly: Guid("fa345779-1917-40e9-bb8f-9bff6bd27e4b")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,6 +31,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

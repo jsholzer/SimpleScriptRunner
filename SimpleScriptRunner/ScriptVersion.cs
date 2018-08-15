@@ -3,45 +3,58 @@ using System;
 namespace SimpleScriptRunner
 {
     [Serializable]
-    internal class ScriptVersion : IComparable<ScriptVersion>
+    public class ScriptVersion : IComparable<ScriptVersion>
     {
-        internal ScriptVersion(int releaseNumber, int scriptNumber, DateTime modified)
+        public ScriptVersion(int major, int minor, int patch, DateTime date, string machineName, string description)
         {
-            ReleaseNumber = releaseNumber;
-            ScriptNumber = scriptNumber;
-            Modified = modified;
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            Date = date;
+            MachineName = machineName;
+            Description = description;
         }
 
-        protected internal int ReleaseNumber { get; private set; }
-
-        internal int ScriptNumber { get; private set; }
-
-        internal DateTime Modified { get; private set; }
-
-        #region IComparable<ScriptVersion> Members
+        public int Major { get; private set; }
+        public int Minor { get; private set; }
+        public int Patch { get; private set; }
+        public DateTime Date { get; set; }
+        public String MachineName { get; private set; }
+        public String Description { get; private set; }
 
         public int CompareTo(ScriptVersion other)
         {
-            var compare = ReleaseNumber.CompareTo(other.ReleaseNumber);
+            int compare = Major.CompareTo(other.Major);
             if (compare != 0)
-            {
                 return compare;
-            }
-            
-            compare = ScriptNumber.CompareTo(other.ScriptNumber);
+
+            compare = Minor.CompareTo(other.Minor);
             if (compare != 0)
-            {
                 return compare;
-            }
-         
-            return RoundDateTime(Modified).CompareTo(RoundDateTime(other.Modified));
+
+            compare = Patch.CompareTo(other.Patch);
+            if (compare != 0)
+                return compare;
+
+            return RoundDateTime(Date).CompareTo(RoundDateTime(other.Date));
         }
 
-        #endregion
+        public int compareIgnoreDate(ScriptVersion other)
+        {
+            int compare = Major.CompareTo(other.Major);
+            if (compare != 0)
+                return compare;
+
+            compare = Minor.CompareTo(other.Minor);
+            if (compare != 0)
+                return compare;
+
+            return Patch.CompareTo(other.Patch);
+        }
 
         public override string ToString()
         {
-            return ReleaseNumber + ", " + ScriptNumber + ", " + Modified;
+            return String.Format("{0}.{1}, {2}, {3}", Major, Minor, Patch, Date);
         }
 
         private DateTime RoundDateTime(DateTime dateTime)
