@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SimpleScriptRunner.Util;
 
 namespace SimpleScriptRunner
 {
     public class Options
     {
+        private const double DEFAULT_TRANSACTION_TIMEOUT = 10.0;
+
         public bool RequireRollback { get; set; }
         public bool UseTransactions { get; set; }
         public int? MaxPatch { get; set; }
@@ -19,37 +22,23 @@ namespace SimpleScriptRunner
         public Options()
         {
             Params = new List<string>();
-            TransactionMinutes = 10;            // waits up to 10 minutes by default
+            TransactionMinutes = DEFAULT_TRANSACTION_TIMEOUT;            // waits up to 10 minutes by default
         }
 
         public void parseArgs(String[] argArray)
         {
+            argArray = argArray.ToArray();        // Copies so that caller is unchanged
+            Dictionary<String, String> switches = ArgsUtil.parseDictionary(ref argArray);
+
             Params.Clear();                       // makes re-entrant
+            Params.AddRange(argArray);
 
-            for (int i = 0; i < argArray.Length; i++)
-            {
-                String param = argArray[i];
-                if (!param.StartsWith("-"))
-                {
-                    Params.Add(param);
-                    continue;
-                }
-
-                String toCheck = param.ToLower().splitAt("=").Item1;                        // ignores any values assigned via a switch
-                switch (toCheck)
-                {
-                    case "-requirerollback": RequireRollback = true; break;
-                    case "-usetransactions": UseTransactions = true; break;
-                    case "-maxpatch": MaxPatch = int.Parse(argArray[++i]); break;
-                    case "-skipconfirm": 
-                    case "--noprompt":
-                    case "-np": 
-                        NoPrompt = true; 
-                        break;
-                    case "-sqlfile": SqlFile = true; break;
-                    case "-trantimeout": TransactionMinutes = double.Parse(argArray[++i]); break;
-                }
-            }
+            RequireRollback = switches.hasAny("-requirerollback", "--requirerollback", "-rr");
+            UseTransactions = switches.hasAny("-usetransactions", "--usetransactions", "-ut");
+            MaxPatch = switches.valueInt("-maxpatch", "--maxpatch", "-mp");
+            NoPrompt = switches.hasAny("-skipconfirm", "--noprompt", "-np");
+            SqlFile = switches.hasAny("-sqlfile", "--sqlfile", "-sf");
+            TransactionMinutes = switches.valueDouble("-trantimeout", "--trantimeout", "-to") ?? DEFAULT_TRANSACTION_TIMEOUT;
         }
 
         public static Options build(String[] argArray)

@@ -67,6 +67,11 @@ namespace SimpleScriptRunner.Util
             return TextHelper.parseIntNullable(value(switchDictionary, keys));
         }
 
+        public static double? valueDouble(this Dictionary<String, String> switchDictionary, params String[] keys)
+        {
+            return TextHelper.parseDoubleNullable(value(switchDictionary, keys));
+        }
+
         public static bool? valueBool(this Dictionary<String, String> switchDictionary, params String[] keys)
         {
             foreach (String key in keys)

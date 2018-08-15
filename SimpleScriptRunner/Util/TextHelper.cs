@@ -49,6 +49,21 @@ namespace SimpleScriptRunner.Util
             }
         }
 
+        public static double? parseDoubleNullable(String source)
+        {
+            if (String.IsNullOrEmpty(source))
+                return null;
+
+            try
+            {
+                return double.Parse(source);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static bool isEqualsIgnoreCase(String a, String b)
         {
             if (a == null)
