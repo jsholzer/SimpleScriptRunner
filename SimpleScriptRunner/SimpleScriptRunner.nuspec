@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/ericraider33/SimpleScriptRunner</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Library for running database scripts across different evnironments for easier DevOps</description>
-    <releaseNotes>Updated switches by adding shorting aliases</releaseNotes>
+    <releaseNotes>Added safety check for TransactionTimeout value to assure that maximum value isn't exceeded</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>MySQL Database Migrations Scripts Version DevOps CommandLine</tags>
   </metadata>

@@ -23,7 +23,7 @@ namespace SimpleScriptRunner
             TransactionScope ts = null;
             if (options.UseTransactions)
             {
-                ts = new TransactionScope(TransactionScopeOption.RequiresNew, TimeSpan.FromMinutes(options.TransactionMinutes));            // maximum wait is 30
+                ts = new TransactionScope(TransactionScopeOption.RequiresNew, options.TransactionTimeout);
             }
             var success = false;
             try

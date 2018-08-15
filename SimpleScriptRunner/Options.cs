@@ -2,27 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using SimpleScriptRunner.Util;
+using System.Transactions;
 
 namespace SimpleScriptRunner
 {
     public class Options
     {
-        private const double DEFAULT_TRANSACTION_TIMEOUT = 10.0;
-
         public bool RequireRollback { get; set; }
         public bool UseTransactions { get; set; }
         public int? MaxPatch { get; set; }
         public bool SkipVersion { get; set; }
         public bool NoPrompt { get; set; }
         public bool SqlFile { get; set; }
-        public double TransactionMinutes { get; set; }
+        public TimeSpan TransactionTimeout { get; set; }
 
         public List<String> Params { get; set; }
 
         public Options()
         {
             Params = new List<string>();
-            TransactionMinutes = DEFAULT_TRANSACTION_TIMEOUT;            // waits up to 10 minutes by default
+            TransactionTimeout = TransactionManager.DefaultTimeout;
         }
 
         public void parseArgs(String[] argArray)
@@ -38,7 +37,25 @@ namespace SimpleScriptRunner
             MaxPatch = switches.valueInt("-maxpatch", "--maxpatch", "-mp");
             NoPrompt = switches.hasAny("-skipconfirm", "--noprompt", "-np");
             SqlFile = switches.hasAny("-sqlfile", "--sqlfile", "-sf");
-            TransactionMinutes = switches.valueDouble("-trantimeout", "--trantimeout", "-to") ?? DEFAULT_TRANSACTION_TIMEOUT;
+
+            double? timeoutValue = switches.valueDouble("-trantimeout", "--trantimeout", "-to");            // specified in minutes, fractional is fine 
+            if (timeoutValue.HasValue)
+            {
+                // Validates that timeout against maximum value
+                TimeSpan timeout = TimeSpan.FromMinutes(timeoutValue.Value);            
+                if (timeout > TransactionManager.MaximumTimeout)
+                    throw new ArgumentException(String.Format("TransactionManager restricts timeouts to a maximum of {0}.\n" +
+                        "Specified timeout value of {1} is too large.\n" +
+                        "Issue can be resolved by changing `maching.config` value for <system.transactions><machineSettings maxTimeout=\"\"/></system.transactions>",
+                        TransactionManager.MaximumTimeout, 
+                        timeout
+                        ));
+
+                if (timeout < TimeSpan.Zero)
+                    throw new ArgumentException(String.Format("Invalid timeout ", timeout));
+
+                TransactionTimeout = timeout;
+            }
         }
 
         public static Options build(String[] argArray)
