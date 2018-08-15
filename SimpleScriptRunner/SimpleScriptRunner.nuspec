@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/ericraider33/SimpleScriptRunner</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Library for running database scripts across different evnironments for easier DevOps</description>
-    <releaseNotes>Customized for MySQL and added strict enforcement of sequential script numbering</releaseNotes>
+    <releaseNotes>Updated switches by adding shorting aliases</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>MySQL Database Migrations Scripts Version DevOps CommandLine</tags>
   </metadata>
