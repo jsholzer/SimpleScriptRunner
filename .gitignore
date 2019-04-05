@@ -3,6 +3,7 @@ bin
 deploy
 deploy/*
 .idea
+.out
 _ReSharper.*
 *.csproj.user
 *.resharper.user

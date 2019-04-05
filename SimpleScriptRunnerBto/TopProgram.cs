@@ -102,7 +102,7 @@ namespace SimpleScriptRunnerBto
             String dbUser = options.Params.Count == 5 ? options.Params[2] : null;
             String dbPasword = options.Params.Count == 5 ? options.Params[3] : null;
 
-            int result = Program.executeSqlFile(path, dbServer, dbName, options, dbUser, dbPasword);
+            int result = Program.executeSqlFile(path, dbServer, dbName, dbUser, dbPasword, options);
 
             Console.WriteLine(result == 0 ? "COMPLETE" : "FAIL");
             if (!skipConfirm)
@@ -119,9 +119,9 @@ namespace SimpleScriptRunnerBto
             try
             {
                 if (options.Params.Count == 3)
-                    Program.executeRelease(options.Params[0], options.Params[1], options, options.Params.Last());
+                    Program.executeRelease(options.Params[0], options.Params[1], options.Params[2]);
                 else
-                    Program.executeRelease(options.Params[0], options.Params[1], options, options.Params.Last(), options.Params[2], options.Params[3]);
+                    Program.executeRelease(options.Params[0], options.Params[1], options.Params[4], options.Params[2], options.Params[3], options);
 
                 return 0;
             }

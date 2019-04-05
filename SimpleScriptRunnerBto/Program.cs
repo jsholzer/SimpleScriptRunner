@@ -19,7 +19,7 @@ namespace SimpleScriptRunnerBto
             try
             {
                 Options options = Options.build(argArray);
-                executeRelease(options.Params[0], options.Params[1], options, options.Params.Last(), options.Params[2], options.Params[3]);
+                executeRelease(options.Params[0], options.Params[1], options.Params[4], options.Params[2], options.Params[3], options);
                 return 0;
             }
             catch (Exception ex)
@@ -29,8 +29,16 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        public static void executeRelease(string serverName, string databaseName, Options options, string path = ".", string username = null, string password = null)
+        public static void executeRelease(string serverName, 
+            string databaseName, 
+            string path = ".", 
+            string username = null, 
+            string password = null,
+            Options options = null
+            )
         {
+            options = options ?? new Options();
+            
             SqlDatabase scriptTarget = !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) ?
                 new SqlDatabase(serverName, databaseName, username, password) :
                 new SqlDatabase(serverName, databaseName);
@@ -44,10 +52,12 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        public static int executeSqlFile(string path, string serverName, string databaseName, Options options, string username = null, string password = null)
+        public static int executeSqlFile(string path, string serverName, string databaseName, string username = null, string password = null, Options options = null)
         {
             try
             {
+                options = options ?? new Options();
+            
                 SqlDatabase scriptTarget = !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) ?
                     new SqlDatabase(serverName, databaseName, username, password) :
                     new SqlDatabase(serverName, databaseName);
