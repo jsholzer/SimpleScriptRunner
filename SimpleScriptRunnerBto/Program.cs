@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using SimpleScriptRunnerBto.MySql;
+using SimpleScriptRunnerBto.Util;
 
 namespace SimpleScriptRunnerBto
 {
@@ -43,9 +44,14 @@ namespace SimpleScriptRunnerBto
                 new SqlDatabase(serverName, databaseName, username, password) :
                 new SqlDatabase(serverName, databaseName);
 
+            String releasePath = Path.Combine(path, "Release");
+            
             ScriptVersion currentVersion = scriptTarget.CurrentVersion;                                                     // only reads version once and relies on scripts executing in proper order
-            foreach (String releaseDirectoryPath in Directory.GetDirectories(path, "Release *"))
+            foreach (String releaseDirectoryPath in Directory.GetDirectories(path, "*"))
             {
+                if (!releaseDirectoryPath.startsWithIgnoreCase(releasePath))        // case insensitive directory scan
+                    continue;
+                
                 IScriptSource<ITextScriptTarget> scriptSource = new FolderContainingNumberedSqlScripts(releaseDirectoryPath, "*.sql");
                 Updater updater = new Updater(scriptSource, scriptTarget, options);
                 updater.applyScripts(currentVersion);
