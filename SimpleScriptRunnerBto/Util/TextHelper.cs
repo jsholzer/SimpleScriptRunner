@@ -80,6 +80,6 @@ namespace SimpleScriptRunnerBto.Util
             if (isEqualsIgnoreCase(value, "true")) return true;
             if (isEqualsIgnoreCase(value, "false")) return false;
             return defaultValue;
-        }
+        }        
     }
 }

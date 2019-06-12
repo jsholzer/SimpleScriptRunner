@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SimpleScriptRunnerBto.Util;
 
 namespace SimpleScriptRunnerBto
 {
@@ -33,24 +34,25 @@ namespace SimpleScriptRunnerBto
                     throw new ArgumentException(String.Format("Invalid release number format: {0} for directory: {1}", releaseNumberText, directory.FullName));
 
                 int counter = 1;
-                List<FileInfo> files = directory.GetFiles(searchPattern).Where(file => !file.FullName.EndsWith("rollback.sql")).ToList();
+                List<FileInfo> files = directory.GetFiles(searchPattern).Where(fi => !fi.FullName.EndsWith("rollback.sql")).OrderBy(fi => fi.Name).ToList();
+                
                 List<NumberedTextScript> result = new List<NumberedTextScript>();
                 foreach (FileInfo file in files)
-                    result.Add(buildScipt(major, minor, file, counter++));
+                    result.Add(buildScript(major, minor, file, counter++));
                 result.Sort();
 
                 return result;
             }
         }
 
-        private NumberedTextScript buildScipt(int major, int minor, FileInfo file, int counter)
+        private NumberedTextScript buildScript(int major, int minor, FileInfo file, int counter)
         {
-            int splitLocation = file.Name.IndexOf(' ');
-
+            Tuple<String, String> pair = file.Name.splitAt(" ");
+            string scriptNumberText = pair.Item1.Trim();
+            string description = pair.Item2.Trim();
+            
             // Parses script number
-            int scriptNumber;
-            string scriptNumberText = file.Name.Substring(0, splitLocation).Trim();
-            string description = file.Name.Substring(splitLocation + 1).Trim();
+            int scriptNumber;            
             if (!int.TryParse(scriptNumberText, out scriptNumber))
                 throw new ArgumentException(String.Format("Invalid script number format: {0} for file: {1}", scriptNumberText, file.FullName));
 
