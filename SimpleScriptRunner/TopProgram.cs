@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +14,7 @@ namespace SimpleScriptRunner
         {
             Options options = Options.build(argArray_);
             if (options.SqlFile)
-                return sqlFileMain(appSettings, options.NoPrompt, options.Params.ToArray());
+                return sqlFileMain(appSettings, options.Params.ToArray());
 
             if (options.Params.Count == 0)
             {
@@ -46,17 +45,10 @@ namespace SimpleScriptRunner
             int result = simpleScriptRunnerProgramMain(options);
 
             Console.WriteLine(result == 0 ? "COMPLETE" : "FAIL");
-            
-            if (!options.NoPrompt && Debugger.IsAttached)
-            {
-                Console.WriteLine("\nPress ENTER to continue");
-                Console.ReadLine();
-            }
-
             return result;
         }
 
-        public static int sqlFileMain(NameValueCollection appSettings, bool skipConfirm, string[] argArray)
+        public static int sqlFileMain(NameValueCollection appSettings, string[] argArray)
         {
             Dictionary<String, String> switches = ArgsUtil.parseDictionary(ref argArray);
             if (argArray.Length == 0)
@@ -105,12 +97,6 @@ namespace SimpleScriptRunner
             int result = Program.executeSqlFile(path, dbServer, dbName, options, dbUser, dbPasword);
 
             Console.WriteLine(result == 0 ? "COMPLETE" : "FAIL");
-            if (!skipConfirm)
-            {
-                Console.WriteLine("Press ENTER to continue");
-                Console.Read();
-            }
-
             return result;
         }
 

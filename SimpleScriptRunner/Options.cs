@@ -12,7 +12,6 @@ namespace SimpleScriptRunner
         public bool UseTransactions { get; set; }
         public int? MaxPatch { get; set; }
         public bool SkipVersion { get; set; }
-        public bool NoPrompt { get; set; }
         public bool SqlFile { get; set; }
         public TimeSpan TransactionTimeout { get; set; }
 
@@ -35,7 +34,6 @@ namespace SimpleScriptRunner
             RequireRollback = switches.hasAny("-requirerollback", "--requirerollback", "-rr");
             UseTransactions = switches.hasAny("-usetransactions", "--usetransactions", "-ut");
             MaxPatch = switches.valueInt("-maxpatch", "--maxpatch", "-mp");
-            NoPrompt = switches.hasAny("-skipconfirm", "--noprompt", "-np");
             SqlFile = switches.hasAny("-sqlfile", "--sqlfile", "-sf");
 
             double? timeoutValue = switches.valueDouble("-trantimeout", "--trantimeout", "-to");            // specified in minutes, fractional is fine 

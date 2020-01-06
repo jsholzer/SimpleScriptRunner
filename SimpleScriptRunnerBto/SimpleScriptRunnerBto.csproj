@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <PackageVersion>1.0.5</PackageVersion>
+        <PackageVersion>1.0.6</PackageVersion>
         <Title>Database Scripts Runner</Title>
         <Authors>BuckTheOdds LLC</Authors>
         <Description>Library for running database scripts across different evnironments for easier DevOps</Description>
-        <Copyright>Copyright 2018-2019</Copyright>
+        <Copyright>Copyright 2018-2020</Copyright>
         <PackageProjectUrl>https://github.com/ericraider33/SimpleScriptRunner</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/ericraider33/SimpleScriptRunner/blob/master/LICENSE.md</PackageLicenseUrl>
         <PackageTags>MySQL Database Migrations Scripts Version DevOps CommandLine</PackageTags>
