@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleScriptProgram", "Simp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleScriptRunnerBto", "SimpleScriptRunnerBto\SimpleScriptRunnerBto.csproj", "{3AB1AB60-AB7E-4E1E-AEC6-E914ADEF6E0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleDb", "SampleDb\SampleDb.csproj", "{2D52AB4B-E7DA-4D80-98B9-A10272F11F9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3AB1AB60-AB7E-4E1E-AEC6-E914ADEF6E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AB1AB60-AB7E-4E1E-AEC6-E914ADEF6E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AB1AB60-AB7E-4E1E-AEC6-E914ADEF6E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D52AB4B-E7DA-4D80-98B9-A10272F11F9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D52AB4B-E7DA-4D80-98B9-A10272F11F9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D52AB4B-E7DA-4D80-98B9-A10272F11F9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D52AB4B-E7DA-4D80-98B9-A10272F11F9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
