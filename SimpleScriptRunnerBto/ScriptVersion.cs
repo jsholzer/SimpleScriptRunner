@@ -5,7 +5,7 @@ namespace SimpleScriptRunnerBto
     [Serializable]
     public class ScriptVersion : IComparable<ScriptVersion>
     {
-        public ScriptVersion(int major, int minor, int patch, DateTime date, string machineName, string description)
+        public ScriptVersion(int major, int minor, long patch, DateTime date, string machineName, string description)
         {
             Major = major;
             Minor = minor;
@@ -17,10 +17,12 @@ namespace SimpleScriptRunnerBto
 
         public int Major { get; private set; }
         public int Minor { get; private set; }
-        public int Patch { get; private set; }
+        public long Patch { get; private set; }
         public DateTime Date { get; set; }
         public String MachineName { get; private set; }
         public String Description { get; private set; }
+
+        public bool IsPatchNumeric { get { return Patch < 1000; } }        // Anything greater than 1000 is assumed to be a timestamp
 
         public int CompareTo(ScriptVersion other)
         {
@@ -50,6 +52,30 @@ namespace SimpleScriptRunnerBto
                 return compare;
 
             return Patch.CompareTo(other.Patch);
+        }
+
+        protected bool Equals(ScriptVersion other)
+        {
+            return Major == other.Major && Minor == other.Minor && Patch == other.Patch;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((ScriptVersion) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = Major;
+                hashCode = (hashCode * 397) ^ Minor;
+                hashCode = (hashCode * 397) ^ Patch.GetHashCode();
+                return hashCode;
+            }
         }
 
         public override string ToString()

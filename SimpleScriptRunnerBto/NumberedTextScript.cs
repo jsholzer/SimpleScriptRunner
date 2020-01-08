@@ -8,7 +8,7 @@ namespace SimpleScriptRunnerBto
     {
         private readonly string path;
 
-        public NumberedTextScript(FileInfo fileInfo, int major, int minor, int scriptNumber, string description)
+        public NumberedTextScript(FileInfo fileInfo, int major, int minor, long scriptNumber, string description)
         {
             path = fileInfo.FullName;
             Version = new ScriptVersion(major, minor, scriptNumber, fileInfo.LastWriteTime, Environment.MachineName, description);

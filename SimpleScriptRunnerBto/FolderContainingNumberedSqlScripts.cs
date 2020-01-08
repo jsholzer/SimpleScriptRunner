@@ -52,18 +52,21 @@ namespace SimpleScriptRunnerBto
             string description = pair.Item2.Trim();
             
             // Parses script number
-            int scriptNumber;            
-            if (!int.TryParse(scriptNumberText, out scriptNumber))
+            long scriptNumber;            
+            if (!long.TryParse(scriptNumberText, out scriptNumber))
                 throw new ArgumentException(String.Format("Invalid script number format: {0} for file: {1}", scriptNumberText, file.FullName));
-
-            if (scriptNumber != counter)
-                throw new ArgumentException(String.Format("Script number: {0} doesn't match expected value: {1} for file: {2}", scriptNumber, counter, file.FullName));
-
+            
             // cleans up description
             if (description.StartsWith("-")) description = description.Substring(1).Trim();
             if (description.EndsWith(".sql", StringComparison.CurrentCultureIgnoreCase)) description = description.Substring(0, description.Length - 4);
+            
+            NumberedTextScript result = new NumberedTextScript(file, major, minor, scriptNumber, description);
+            
+            // Checks sequential number, if a number is provided.  Anything greater than 1000 is assumed to be a timestamp and sequence isn't enforced
+            if (result.Version.IsPatchNumeric && scriptNumber != counter)
+                throw new ArgumentException(String.Format("Script number: {0} doesn't match expected value: {1} for file: {2}", scriptNumber, counter, file.FullName));
 
-            return new NumberedTextScript(file, major, minor, scriptNumber, description);
+            return result;
         }
 
         #endregion

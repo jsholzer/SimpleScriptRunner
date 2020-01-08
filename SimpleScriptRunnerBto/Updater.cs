@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 
 namespace SimpleScriptRunnerBto
 {
@@ -9,16 +10,17 @@ namespace SimpleScriptRunnerBto
         private readonly ITextScriptTarget scriptTarget;
         private readonly Options options;
 
+        private readonly List<int> skippedMajor = new List<int>();
+        private readonly List<int> skippedMinor = new List<int>();
+        private List<ScriptVersion> existingPatches;
+        
         public Updater(IScriptSource<ITextScriptTarget> scriptSource, ITextScriptTarget scriptTarget, Options options)
         {
             this.scriptSource = scriptSource;
             this.scriptTarget = scriptTarget;
             this.options = options;
         }
-
-        private static readonly List<int> skippedMajor = new List<int>();
-        private static readonly List<int> skippedMinor = new List<int>();
-
+        
         public void applyScripts(ScriptVersion currentVersion)
         {
             foreach (IScript<ITextScriptTarget> script in scriptSource.Scripts)
@@ -39,20 +41,25 @@ namespace SimpleScriptRunnerBto
                     skippedMinor.Add(script.Version.Minor);
                     Console.WriteLine("Skipping release: {0}.{1}", script.Version.Major, script.Version.Minor);
                 }
-                else if (script.Version.compareIgnoreDate(currentVersion) <= 0)
-                {
-                    Console.WriteLine("Skipping patch: {0}", script);
-                }
                 else if (options.MaxPatch != null && script.Version.Patch > options.MaxPatch.Value)
                 {
                     Console.WriteLine("Stopping at maximum patch {0}", options.MaxPatch);
                     return;
                 }
-                else
+                else 
                 {
+                    existingPatches = existingPatches ?? scriptTarget.getPatches(currentVersion.Major, currentVersion.Minor);      
+                    if (existingPatches.Contains(script.Version))
+                    {
+                        Console.WriteLine("Skipping patch: {0}", script);
+                        continue;
+                    }
+
                     Console.WriteLine("Running: {0}", script);
                     script.apply(scriptTarget, options);
-                    currentVersion = scriptTarget.CurrentVersion;
+                    
+                    if (scriptTarget.CurrentVersion.CompareTo(currentVersion) > 0)
+                        currentVersion = scriptTarget.CurrentVersion;
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using MySql.Data.MySqlClient;
 
@@ -6,6 +7,13 @@ namespace SimpleScriptRunnerBto.MySql
 {
     public class SqlDatabase : ITextScriptTarget, IDisposable
     {
+        public enum VersionEnum
+        {
+            None,
+            V1, 
+            V2
+        }
+        
         private String hostString;
         private MySqlConnection connection;
 
@@ -13,17 +21,16 @@ namespace SimpleScriptRunnerBto.MySql
 @"CREATE TABLE db_version (
 Major INT NOT NULL,
 Minor INT NOT NULL,
-Patch INT NOT NULL,
+Patch BIGINT NOT NULL,
 Modified TIMESTAMP NOT NULL,
 `MachineName` varchar(100) NOT NULL,  
 `Description` varchar(200) NOT NULL,  
 PRIMARY KEY (Major,Minor,Patch)
 )";
 
-        private const String READ_QUERY = @"
-SELECT Major,Minor,Patch,Modified,MachineName,Description
-FROM db_version
-order by Major desc, Minor desc, Patch desc
+        private const String VERSION_TABLE_UPGRADE_V2 =
+@"ALTER TABLE db_version
+MODIFY COLUMN `Patch` BIGINT NOT NULL
 ";
         
         private const String INSERT_COMMAND = @"
@@ -35,7 +42,7 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
         private const String TEST_CONNECTION_QUERY = @"select 519";
         private const long TEST_CONNECTION_RESULT = 519;
 
-        private const String TEST_TABLE_QUERY = "select count(*) from db_version";
+        private const String TEST_TABLE_QUERY = "select `Patch` from db_version limit 1";
 
         public SqlDatabase(String hostString)
         {
@@ -84,8 +91,12 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             {
                 verify();
 
-                if (!isTablePresent())
-                    createTable();
+                switch (getTableVersion())
+                {
+                    case VersionEnum.None:   createTable();      break;
+                    case VersionEnum.V1:     upgradeVersion2();  break;
+                    case VersionEnum.V2: break;
+                }
 
                 ScriptVersion result = readScriptVersion();
                 if (result != null)
@@ -123,7 +134,7 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             }
         }
 
-        private bool isTablePresent()
+        private VersionEnum getTableVersion()
         {
             try
             {
@@ -132,13 +143,19 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
                     DataSet dataSet = new DataSet();
                     sql.Fill(dataSet);
 
-                    long result = (long)dataSet.Tables[0].Rows[0].ItemArray[0];
-                    return result >= 0;
+                    if (dataSet.Tables[0].Rows.Count == 0)
+                        return VersionEnum.None;
+                    
+                    object patchInstance = dataSet.Tables[0].Rows[0].ItemArray[0];
+                    if (patchInstance is long)
+                        return VersionEnum.V2;
+                    else
+                        return VersionEnum.V1;
                 }
             }
             catch (Exception)
             {
-                return false;
+                return VersionEnum.None;
             }
         }
 
@@ -151,8 +168,23 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             }
         }
 
+        private void upgradeVersion2()
+        {
+            using (MySqlCommand cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = VERSION_TABLE_UPGRADE_V2;
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         private ScriptVersion readScriptVersion()
         {
+             const String READ_QUERY = @"
+SELECT Major,Minor,Patch,Modified,MachineName,Description
+FROM db_version
+order by Major desc, Minor desc, Patch desc
+";
+            
             using (MySqlDataAdapter sql = new MySqlDataAdapter(READ_QUERY, connection))
             {
                 DataSet dataSet = new DataSet();
@@ -163,9 +195,36 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
                     return null;
 
                 DataRow itemArray = dbVersion.Rows[0];
-                return new ScriptVersion((int)itemArray[0], (int)itemArray[1], (int)itemArray[2], (DateTime)itemArray[3], (String)itemArray[4], (String)itemArray[5]);
+                return new ScriptVersion((int)itemArray[0], (int)itemArray[1], (long)itemArray[2], (DateTime)itemArray[3], (String)itemArray[4], (String)itemArray[5]);
             }
         }
+
+        public List<ScriptVersion> getPatches(int major, int minor)
+        {
+            const String READ_QUERY = @"
+SELECT Major,Minor,Patch,Modified,MachineName,Description
+FROM db_version
+where Major = @Major and Minor = @Minor
+order by Patch
+";
+            List<ScriptVersion> results = new List<ScriptVersion>();
+            using (MySqlCommand cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = READ_QUERY;
+                cmd.Parameters.AddWithValue("@Major", major);
+                cmd.Parameters.AddWithValue("@Minor", minor);
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        results.Add(new ScriptVersion((int)reader[0], (int)reader[1], (long)reader[2], (DateTime)reader[3], (String)reader[4], (String)reader[5]));
+                    }
+                }
+            }
+
+            return results;
+        }
+        
 
         public void apply(string content)
         {

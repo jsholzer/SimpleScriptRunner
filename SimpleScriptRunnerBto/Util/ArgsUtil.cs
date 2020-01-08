@@ -67,6 +67,11 @@ namespace SimpleScriptRunnerBto.Util
             return TextHelper.parseIntNullable(value(switchDictionary, keys));
         }
 
+        public static long? valueLong(this Dictionary<String, String> switchDictionary, params String[] keys)
+        {
+            return TextHelper.parseLongNullable(value(switchDictionary, keys));
+        }
+
         public static double? valueDouble(this Dictionary<String, String> switchDictionary, params String[] keys)
         {
             return TextHelper.parseDoubleNullable(value(switchDictionary, keys));

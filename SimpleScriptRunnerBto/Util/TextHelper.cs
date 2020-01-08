@@ -49,6 +49,21 @@ namespace SimpleScriptRunnerBto.Util
             }
         }
 
+        public static long? parseLongNullable(String source)
+        {
+            if (String.IsNullOrEmpty(source))
+                return null;
+
+            try
+            {
+                return long.Parse(source);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static double? parseDoubleNullable(String source)
         {
             if (String.IsNullOrEmpty(source))
