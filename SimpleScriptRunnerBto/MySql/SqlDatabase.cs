@@ -144,7 +144,7 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
                     sql.Fill(dataSet);
 
                     if (dataSet.Tables[0].Rows.Count == 0)
-                        return VersionEnum.None;
+                        return VersionEnum.V2;
                     
                     object patchInstance = dataSet.Tables[0].Rows[0].ItemArray[0];
                     if (patchInstance is long)
