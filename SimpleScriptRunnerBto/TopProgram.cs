@@ -16,7 +16,7 @@ namespace SimpleScriptRunnerBto
             if (options.SqlFile)
                 return sqlFileMain(appSettings, options.Params.ToArray());
 
-            if (options.Params.Count == 0)
+            if (options.Params.Length == 0)
             {
                 Console.WriteLine("Please enter database to update [{0}]:", String.Join(", ", appSettings.AllKeys));
                 String userInput = Console.ReadLine();
@@ -24,14 +24,14 @@ namespace SimpleScriptRunnerBto
                 // Merges options with user input
                 options.parseArgs(userInput.Split(' '));
 
-                if (options.Params.Count != 1 || !appSettings.AllKeys.Contains(options.Params[0].ToLower()))
+                if (options.Params.Length != 1 || !appSettings.AllKeys.Contains(options.Params[0].ToLower()))
                 {
                     Console.WriteLine("Invalidate selection: {0}", userInput);
                     return 519;
                 }
             }
 
-            if (options.Params.Count == 1)
+            if (options.Params.Length == 1)
             {
                 String value = appSettings[options.Params[0].ToLower()];
                 Console.WriteLine("Argument {0} with value: {1}", options.Params[0], value);
@@ -83,18 +83,9 @@ namespace SimpleScriptRunnerBto
             String targetValue = appSettings[target.ToLower()];
             Console.WriteLine("Target {0} with value: {1}", target, targetValue);
             Options options = Options.build(targetValue.Split(' '));
-
-            if (options.Params.Count != 5 && options.Params.Count != 3)
-            {
-                Console.WriteLine("Invalid configuration: {0}", targetValue);
-                return 619;
-            }
-            String dbServer = options.Params[0];
-            String dbName = options.Params[1];
-            String dbUser = options.Params.Count == 5 ? options.Params[2] : null;
-            String dbPasword = options.Params.Count == 5 ? options.Params[3] : null;
-
-            int result = Program.executeSqlFile(path, dbServer, dbName, dbUser, dbPasword, options);
+            options.Path = path;
+            
+            int result = Program.executeSqlFile(options);
 
             Console.WriteLine(result == 0 ? "COMPLETE" : "FAIL");
             return result;
@@ -104,11 +95,7 @@ namespace SimpleScriptRunnerBto
         {
             try
             {
-                if (options.Params.Count == 3)
-                    Program.executeRelease(options.Params[0], options.Params[1], options.Params[2]);
-                else
-                    Program.executeRelease(options.Params[0], options.Params[1], options.Params[4], options.Params[2], options.Params[3], options);
-
+                Program.executeRelease(options);
                 return 0;
             }
             catch (Exception ex)

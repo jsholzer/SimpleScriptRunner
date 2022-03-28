@@ -14,12 +14,18 @@ namespace SimpleScriptRunnerBto
         public bool SkipVersion { get; set; }
         public bool SqlFile { get; set; }
         public TimeSpan TransactionTimeout { get; set; }
+        public String SslMode { get; set; }
 
-        public List<String> Params { get; set; }
+        public String ServerName { get; set; }
+        public String DatabaseName { get; set; }
+        public String UserName { get; set; }
+        public String Password { get; set; }
+        
+        public String Path { get; set; }
+        public String[] Params { get; set; }
 
         public Options()
         {
-            Params = new List<string>();
             TransactionTimeout = TransactionManager.DefaultTimeout;
         }
 
@@ -28,13 +34,27 @@ namespace SimpleScriptRunnerBto
             argArray = argArray.ToArray();        // Copies so that caller is unchanged
             Dictionary<String, String> switches = ArgsUtil.parseDictionary(ref argArray);
 
-            Params.Clear();                       // makes re-entrant
-            Params.AddRange(argArray);
-
+            Params = argArray;
+            if (argArray.Length == 3)
+            {
+                ServerName = argArray[0];
+                DatabaseName = argArray[1];
+                Path = argArray[2];
+            }
+            else if (argArray.Length == 5)
+            {
+                ServerName = argArray[0];
+                DatabaseName = argArray[1];
+                UserName = argArray[2];
+                Password = argArray[3];
+                Path = argArray[4];
+            }
+                    
             RequireRollback = switches.hasAny("-requirerollback", "--requirerollback", "-rr");
             UseTransactions = switches.hasAny("-usetransactions", "--usetransactions", "-ut");
             MaxPatch = switches.valueLong("-maxpatch", "--maxpatch", "-mp");
             SqlFile = switches.hasAny("-sqlfile", "--sqlfile", "-sf");
+            SslMode = switches.value("--sslmode", "-sm");
 
             double? timeoutValue = switches.valueDouble("-trantimeout", "--trantimeout", "-to");            // specified in minutes, fractional is fine 
             if (timeoutValue.HasValue)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 using MySql.Data.MySqlClient;
 
 namespace SimpleScriptRunnerBto.MySql
@@ -14,7 +15,7 @@ namespace SimpleScriptRunnerBto.MySql
             V2
         }
         
-        private String hostString;
+        private String connectionString;
         private MySqlConnection connection;
 
         private const String VERSION_TABLE_CREATE =
@@ -44,44 +45,46 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
 
         private const String TEST_TABLE_QUERY = "select `Patch` from db_version limit 1";
 
-        public SqlDatabase(String hostString)
+        public SqlDatabase(String theConnectionString)
         {
-            createConnection(theHostString: hostString);
-            Console.WriteLine("CurrentVersion: " + CurrentVersion);
+            createConnection(theConnectionString: theConnectionString);
+            Console.WriteLine("Connection String: " + connectionString);
+            Console.WriteLine("Current Version: " + CurrentVersion);
         }
 
-        public SqlDatabase(String serverName, String databaseName, String username, String password)
+        public SqlDatabase(Options options)
         {
-            createConnection(serverName: serverName, databaseName: databaseName, username: username, password: password);
-            Console.WriteLine("CurrentVersion: " + CurrentVersion);
+            createConnection(options: options);
+            Console.WriteLine("Connection String: " + connectionString);
+            Console.WriteLine("Current Version: " + CurrentVersion);
         }
 
-        public SqlDatabase(String serverName, String databaseName)
+        private void createConnection(String theConnectionString = null, Options options = null)
         {
-            createConnection(serverName: serverName, databaseName: databaseName);
-            Console.WriteLine("CurrentVersion: " + CurrentVersion);
-        }
+            connectionString = theConnectionString;
 
-        private void createConnection(String theHostString = null, String serverName = null, String databaseName = null, String username = null, String password = null, int? timeOut = null)
-        {
-            hostString = theHostString;
-
-            if (hostString == null)
+            if (connectionString == null)
             {
-                if (username != null && password != null)
-                    hostString = String.Format("Server={0};Port=3306;Database={1};Uid={2};Pwd={3};pooling=false;", serverName, databaseName, username, password);
-                else
-                    hostString = String.Format("Server={0};Port=3306;Database={1};pooling=false;", serverName, databaseName);
+                StringBuilder builder = new StringBuilder();
+                builder.Append("Server=").Append(options.ServerName).Append(";");
+                builder.Append("Port=").Append("3306").Append(";");
+                builder.Append("Database=").Append(options.DatabaseName).Append(";");
+                if (options.UserName != null && options.Password != null)
+                {
+                    builder.Append("Uid=").Append(options.UserName).Append(";");
+                    builder.Append("Pwd=").Append(options.Password).Append(";");
+                }
+                builder.Append("pooling=").Append("false").Append(";");
+                if (options.SslMode != null)
+                    builder.Append("SslMode=").Append(options.SslMode).Append(";");
+
+                int timeOut = 15 * 60; 
+                builder.Append("defaultcommandtimeout=").Append(timeOut).Append(";");
+
+                connectionString = builder.ToString();
             }
 
-            timeOut = timeOut ?? 15 * 60;         // defaults to 15 minutes
-            if (!hostString.Contains("defaultcommandtimeout="))
-            {
-                if (!hostString.EndsWith(";")) hostString += ";";
-                hostString += "defaultcommandtimeout=" + timeOut + ";";                   
-            }
-
-            connection = new MySqlConnection(hostString);
+            connection = new MySqlConnection(connectionString);
             connection.Open();
         }
 

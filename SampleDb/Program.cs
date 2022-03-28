@@ -8,11 +8,12 @@ namespace SampleDb
         {
             Options options = new Options();
             options.UseTransactions = true;
-            options.Params.Add("localhost");
-            options.Params.Add("simple_script_runner_sample");
-            options.Params.Add("simplescriptadmin");
-            options.Params.Add("abc123");
-            options.Params.Add("sample");
+            options.ServerName = "localhost";
+            options.DatabaseName = "simple_script_runner_sample";
+            options.UserName = "simplescriptadmin";
+            options.Password = "abc123";
+            options.Path = "sample";
+
             TopProgram.simpleScriptRunnerProgramMain(options);
         }
     }

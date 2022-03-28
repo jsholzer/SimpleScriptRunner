@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using SimpleScriptRunnerBto.MySql;
 using SimpleScriptRunnerBto.Util;
@@ -20,7 +19,7 @@ namespace SimpleScriptRunnerBto
             try
             {
                 Options options = Options.build(argArray);
-                executeRelease(options.Params[0], options.Params[1], options.Params[4], options.Params[2], options.Params[3], options);
+                executeRelease(options);
                 return 0;
             }
             catch (Exception ex)
@@ -30,24 +29,14 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        public static void executeRelease(string serverName, 
-            string databaseName, 
-            string path = ".", 
-            string username = null, 
-            string password = null,
-            Options options = null
-            )
+        public static void executeRelease(Options options)
         {
-            options = options ?? new Options();
-            
-            SqlDatabase scriptTarget = !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) ?
-                new SqlDatabase(serverName, databaseName, username, password) :
-                new SqlDatabase(serverName, databaseName);
+            SqlDatabase scriptTarget = new SqlDatabase(options);
 
-            String releasePath = Path.Combine(path, "Release");
+            String releasePath = Path.Combine(options.Path, "Release");
             
             ScriptVersion currentVersion = scriptTarget.CurrentVersion;                                                     // only reads version once and relies on scripts executing in proper order
-            foreach (String releaseDirectoryPath in Directory.GetDirectories(path, "*"))
+            foreach (String releaseDirectoryPath in Directory.GetDirectories(options.Path, "*"))
             {
                 if (!releaseDirectoryPath.startsWithIgnoreCase(releasePath))        // case insensitive directory scan
                     continue;
@@ -58,19 +47,16 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        public static int executeSqlFile(string path, string serverName, string databaseName, string username = null, string password = null, Options options = null)
+        public static int executeSqlFile(Options options)
         {
             try
             {
-                options = options ?? new Options();
             
-                SqlDatabase scriptTarget = !string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password) ?
-                    new SqlDatabase(serverName, databaseName, username, password) :
-                    new SqlDatabase(serverName, databaseName);
+                SqlDatabase scriptTarget = new SqlDatabase(options);
 
                 options.SkipVersion = true;         // turns off setting patch version since file is free form sql
 
-                FileInfo file = new FileInfo(path);
+                FileInfo file = new FileInfo(options.Path);
                 IScript<ITextScriptTarget> script = new NumberedTextScript(file, 0, 0, 0, "");
                 script.apply(scriptTarget, options);
 
