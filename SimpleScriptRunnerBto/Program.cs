@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using SimpleScriptRunnerBto.MySql;
 using SimpleScriptRunnerBto.Util;
@@ -36,7 +37,7 @@ namespace SimpleScriptRunnerBto
             String releasePath = Path.Combine(options.Path, "Release");
             
             ScriptVersion currentVersion = scriptTarget.CurrentVersion;                                                     // only reads version once and relies on scripts executing in proper order
-            foreach (String releaseDirectoryPath in Directory.GetDirectories(options.Path, "*"))
+            foreach (String releaseDirectoryPath in Directory.GetDirectories(options.Path, "*").OrderBy(x => x))
             {
                 if (!releaseDirectoryPath.startsWithIgnoreCase(releasePath))        // case insensitive directory scan
                     continue;

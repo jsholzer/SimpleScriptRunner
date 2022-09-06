@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <PackageVersion>1.0.9</PackageVersion>
+        <PackageVersion>1.0.10</PackageVersion>
         <Title>Database Scripts Runner</Title>
         <Authors>BuckTheOdds LLC</Authors>
         <Description>Library for running database scripts across different evnironments for easier DevOps</Description>
