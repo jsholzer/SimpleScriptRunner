@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -34,19 +35,24 @@ namespace SimpleScriptRunnerBto
         {
             SqlDatabase scriptTarget = new SqlDatabase(options);
 
-            String releasePath = Path.Combine(options.Path, "Release");
+            String releasePath = Path.Combine(options.Path, ReleaseDir.RELEASE);
+            String[] matchingReleases = Directory.GetDirectories(options.Path, "*");
+            List<ReleaseDir> releases = matchingReleases
+                .Where(x => x.startsWithIgnoreCase(releasePath))            // case insensitive directory scan
+                .Select(ReleaseDir.fromPath)
+                .Where(x => x != null)
+                .OrderBy(x => x.ReleaseVersion)
+                .ToList();
             
             ScriptVersion currentVersion = scriptTarget.CurrentVersion;                                                     // only reads version once and relies on scripts executing in proper order
-            foreach (String releaseDirectoryPath in Directory.GetDirectories(options.Path, "*").OrderBy(x => x))
+            foreach (ReleaseDir releaseDirectory in releases)
             {
-                if (!releaseDirectoryPath.startsWithIgnoreCase(releasePath))        // case insensitive directory scan
-                    continue;
-                
-                IScriptSource<ITextScriptTarget> scriptSource = new FolderContainingNumberedSqlScripts(releaseDirectoryPath, "*.sql");
+                IScriptSource<ITextScriptTarget> scriptSource = new FolderContainingNumberedSqlScripts(releaseDirectory.Path, "*.sql");
                 Updater updater = new Updater(scriptSource, scriptTarget, options);
                 updater.applyScripts(currentVersion);
             }
         }
+        
 
         public static int executeSqlFile(Options options)
         {
