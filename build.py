@@ -2,6 +2,12 @@
 # Refernces: 
 # https://docs.microsoft.com/en-us/nuget/quickstart/create-and-publish-a-package-using-the-dotnet-cli
 # https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet?tabs=netcore21
+#
+# To release a new version
+# 1) From IDE or edit project file, change SimpleScriptRunnerBto.csproj by increasing the "PackageVersion" number
+# 2) Run this script with a target of nuget
+# 3) Find output (like .out\SimpleScriptRunnerBto.1.0.11.nupkg) and publish to nuget
+#
 import subprocess, argparse, os, zipfile, shutil, glob
 
 parser = argparse.ArgumentParser(description='Builds SimpleScriptRunnerBto')
