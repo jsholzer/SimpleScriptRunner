@@ -17,7 +17,7 @@ SimpleScriptRunner.exe <serverName> <databaseName> <path to folder containing sq
 ```
 or for SQL Authentication
 ```
-SimpleScriptRunner.exe <serverName> <username> <password> <databaseName> <path to folder containing sql scripts> [options]
+SimpleScriptRunner.exe <serverName> <databaseName> <username> <password> <path to folder containing sql scripts> [options]
 ```
 
 the sql scripts should start with the script version number and then a space, and be grouped into numbered Release folders.

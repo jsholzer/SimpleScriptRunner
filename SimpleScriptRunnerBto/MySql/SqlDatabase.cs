@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using MySql.Data.MySqlClient;
+using Dapper;
+using MySqlConnector;
 
 namespace SimpleScriptRunnerBto.MySql
 {
@@ -66,20 +67,21 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             if (connectionString == null)
             {
                 StringBuilder builder = new StringBuilder();
-                builder.Append("Server=").Append(options.ServerName).Append(";");
-                builder.Append("Port=").Append("3306").Append(";");
-                builder.Append("Database=").Append(options.DatabaseName).Append(";");
+                builder.Append($"Server={options.ServerName};");
+                builder.Append("Port=3306;");
+                builder.Append($"Database={options.DatabaseName};");
                 if (options.UserName != null && options.Password != null)
                 {
-                    builder.Append("Uid=").Append(options.UserName).Append(";");
-                    builder.Append("Pwd=").Append(options.Password).Append(";");
+                    builder.Append($"Uid={options.UserName};");
+                    builder.Append($"Pwd={options.Password};");
                 }
-                builder.Append("pooling=").Append("false").Append(";");
+                builder.Append("Pooling=false;");
+                builder.Append("AllowUserVariables=true;");
                 if (options.SslMode != null)
-                    builder.Append("SslMode=").Append(options.SslMode).Append(";");
+                    builder.Append($"SslMode={options.SslMode};");
 
-                int timeOut = 15 * 60; 
-                builder.Append("defaultcommandtimeout=").Append(timeOut).Append(";");
+                int timeOut = 15 * 60; // 15 minutes
+                builder.Append($"DefaultCommandTimeout={timeOut};");
 
                 connectionString = builder.ToString();
             }
@@ -231,8 +233,11 @@ order by Patch
 
         public void apply(string content)
         {
-            MySqlScript script = new MySqlScript(connection, content);
-            script.Execute();
+            if (string.IsNullOrWhiteSpace(content)) return;
+            
+            connection.Execute(content);
+            // MySqlScript script = new MySqlScript(connection, content);
+            // script.Execute();
         }
 
         public void updateVersion(ScriptVersion version)
