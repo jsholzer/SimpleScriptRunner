@@ -4,25 +4,25 @@ using System.IO;
 using System.Linq;
 using SimpleScriptRunnerBto.Util;
 
-namespace SimpleScriptRunnerBto
-{
-    internal class FolderContainingNumberedSqlScripts : IScriptSource<ITextScriptTarget>
-    {
-        private readonly string path;
-        private readonly string searchPattern;
+namespace SimpleScriptRunnerBto;
 
-        public FolderContainingNumberedSqlScripts(string path, string searchPattern)
-        {
+internal class FolderContainingNumberedSqlScripts : IScriptSource<ITextScriptTarget>
+{
+    private readonly string path;
+    private readonly string searchPattern;
+
+    public FolderContainingNumberedSqlScripts(string path, string searchPattern)
+    {
             this.path = path;
             this.searchPattern = searchPattern;
         }
 
-        #region IScriptSource<ITextScriptTarget> Members
+    #region IScriptSource<ITextScriptTarget> Members
 
-        public IEnumerable<IScript<ITextScriptTarget>> Scripts
+    public IEnumerable<IScript<ITextScriptTarget>> Scripts
+    {
+        get
         {
-            get
-            {
                 DirectoryInfo directory = new DirectoryInfo(path);
 
                 // Parses release number
@@ -43,10 +43,10 @@ namespace SimpleScriptRunnerBto
 
                 return result;
             }
-        }
+    }
 
-        private NumberedTextScript buildScript(int major, int minor, FileInfo file, int counter)
-        {
+    private NumberedTextScript buildScript(int major, int minor, FileInfo file, int counter)
+    {
             Tuple<String, String> pair = file.Name.splitAt(" ");
             string scriptNumberText = pair.Item1.Trim();
             string description = pair.Item2.Trim();
@@ -69,6 +69,5 @@ namespace SimpleScriptRunnerBto
             return result;
         }
 
-        #endregion
-    }
+    #endregion
 }

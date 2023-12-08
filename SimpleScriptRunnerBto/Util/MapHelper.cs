@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SimpleScriptRunnerBto.Util
+namespace SimpleScriptRunnerBto.Util;
+
+public static class MapHelper
 {
-    public static class MapHelper
+    public static VType cache<KType, VType>(this Dictionary<KType, VType> map, KType key, Func<VType> builder)
     {
-        public static VType cache<KType, VType>(this Dictionary<KType, VType> map, KType key, Func<VType> builder)
-        {
             if (map.ContainsKey(key))
                 return map[key];
 
@@ -17,8 +17,8 @@ namespace SimpleScriptRunnerBto.Util
             return value;
         }
 
-        public static String toValueString<KType, VType>(this Dictionary<KType, VType> map) where KType : IComparable
-        {
+    public static String toValueString<KType, VType>(this Dictionary<KType, VType> map) where KType : IComparable
+    {
             StringBuilder result = new StringBuilder();
 
             foreach (KType key in map.Keys.OrderBy(x => x))
@@ -31,23 +31,23 @@ namespace SimpleScriptRunnerBto.Util
             return result.ToString();
         }
 
-        public static VType getValue<KType, VType>(this Dictionary<KType, VType> map, KType key) where KType : IComparable
-        {
+    public static VType getValue<KType, VType>(this Dictionary<KType, VType> map, KType key) where KType : IComparable
+    {
             if (map.ContainsKey(key))
                 return map[key];
             return default(VType);
         }
 
-        public static void setValue<KType, VType>(this Dictionary<KType, VType> map, KType key, VType value) where KType : IComparable
-        {
+    public static void setValue<KType, VType>(this Dictionary<KType, VType> map, KType key, VType value) where KType : IComparable
+    {
             if (map.ContainsKey(key))
                 map[key] = value;
             else
                 map.Add(key, value);
         }
 
-        public static List<KType> findMissingKeys<KType, VType>(this Dictionary<KType, VType> map, IEnumerable<KType> keys)
-        {
+    public static List<KType> findMissingKeys<KType, VType>(this Dictionary<KType, VType> map, IEnumerable<KType> keys)
+    {
             List<KType> results = new List<KType>();
             foreach (KType key in keys)
                 if (!map.ContainsKey(key))
@@ -56,8 +56,8 @@ namespace SimpleScriptRunnerBto.Util
             return results;
         }
 
-        public static List<KType> findExtraneousKeys<KType, VType>(this Dictionary<KType, VType> map, ICollection<KType> keys)
-        {
+    public static List<KType> findExtraneousKeys<KType, VType>(this Dictionary<KType, VType> map, ICollection<KType> keys)
+    {
             List<KType> results = new List<KType>();
             foreach (KType key in map.Keys)
                 if (!keys.Contains(key))
@@ -65,5 +65,4 @@ namespace SimpleScriptRunnerBto.Util
 
             return results;
         }
-    }
 }

@@ -1,8 +1,7 @@
-namespace SimpleScriptRunnerBto
+namespace SimpleScriptRunnerBto;
+
+public interface IScript<T> where T : IScriptTarget
 {
-	public interface IScript<T> where T : IScriptTarget
-	{
-		ScriptVersion Version { get; }
-        void apply(T scriptTarget, Options options);
-    }
+	ScriptVersion Version { get; }
+	void apply(T scriptTarget, Options options);
 }

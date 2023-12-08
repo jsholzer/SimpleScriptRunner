@@ -10,7 +10,7 @@
         <PackageLicenseUrl>https://github.com/ericraider33/SimpleScriptRunner/blob/master/LICENSE.md</PackageLicenseUrl>
         <PackageTags>MySQL Database Migrations Scripts Version DevOps CommandLine</PackageTags>
         <PackageReleaseNotes>Modified directory scan to sort results to be consistent between win/Linux</PackageReleaseNotes>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>

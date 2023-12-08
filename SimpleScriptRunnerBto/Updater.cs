@@ -2,27 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 
-namespace SimpleScriptRunnerBto
-{
-    public class Updater 
-    {
-        private readonly IScriptSource<ITextScriptTarget> scriptSource;
-        private readonly ITextScriptTarget scriptTarget;
-        private readonly Options options;
+namespace SimpleScriptRunnerBto;
 
-        private readonly List<int> skippedMajor = new List<int>();
-        private readonly List<int> skippedMinor = new List<int>();
-        private List<ScriptVersion> existingPatches;
+public class Updater 
+{
+    private readonly IScriptSource<ITextScriptTarget> scriptSource;
+    private readonly ITextScriptTarget scriptTarget;
+    private readonly Options options;
+
+    private readonly List<int> skippedMajor = new List<int>();
+    private readonly List<int> skippedMinor = new List<int>();
+    private List<ScriptVersion> existingPatches;
         
-        public Updater(IScriptSource<ITextScriptTarget> scriptSource, ITextScriptTarget scriptTarget, Options options)
-        {
+    public Updater(IScriptSource<ITextScriptTarget> scriptSource, ITextScriptTarget scriptTarget, Options options)
+    {
             this.scriptSource = scriptSource;
             this.scriptTarget = scriptTarget;
             this.options = options;
         }
         
-        public void applyScripts(ScriptVersion currentVersion)
-        {
+    public void applyScripts(ScriptVersion currentVersion)
+    {
             foreach (IScript<ITextScriptTarget> script in scriptSource.Scripts)
             {
                 if (script.Version.Major < currentVersion.Major)
@@ -63,5 +63,4 @@ namespace SimpleScriptRunnerBto
                 }
             }
         }
-    }
 }

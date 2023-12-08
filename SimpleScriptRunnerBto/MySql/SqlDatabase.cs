@@ -5,22 +5,22 @@ using System.Text;
 using Dapper;
 using MySqlConnector;
 
-namespace SimpleScriptRunnerBto.MySql
-{
-    public class SqlDatabase : ITextScriptTarget, IDisposable
-    {
-        public enum VersionEnum
-        {
-            None,
-            V1, 
-            V2
-        }
-        
-        private String connectionString;
-        private MySqlConnection connection;
+namespace SimpleScriptRunnerBto.MySql;
 
-        private const String VERSION_TABLE_CREATE =
-@"CREATE TABLE db_version (
+public class SqlDatabase : ITextScriptTarget, IDisposable
+{
+    public enum VersionEnum
+    {
+        None,
+        V1, 
+        V2
+    }
+        
+    private String connectionString;
+    private MySqlConnection connection;
+
+    private const String VERSION_TABLE_CREATE =
+        @"CREATE TABLE db_version (
 Major INT NOT NULL,
 Minor INT NOT NULL,
 Patch BIGINT NOT NULL,
@@ -30,38 +30,38 @@ Modified TIMESTAMP NOT NULL,
 PRIMARY KEY (Major,Minor,Patch)
 )";
 
-        private const String VERSION_TABLE_UPGRADE_V2 =
-@"ALTER TABLE db_version
+    private const String VERSION_TABLE_UPGRADE_V2 =
+        @"ALTER TABLE db_version
 MODIFY COLUMN `Patch` BIGINT NOT NULL
 ";
         
-        private const String INSERT_COMMAND = @"
+    private const String INSERT_COMMAND = @"
 INSERT INTO db_version
 (Major,Minor,Patch,Modified,MachineName,Description)     
 VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
 ";
 
-        private const String TEST_CONNECTION_QUERY = @"select 519";
-        private const long TEST_CONNECTION_RESULT = 519;
+    private const String TEST_CONNECTION_QUERY = @"select 519";
+    private const long TEST_CONNECTION_RESULT = 519;
 
-        private const String TEST_TABLE_QUERY = "select `Patch` from db_version limit 1";
+    private const String TEST_TABLE_QUERY = "select `Patch` from db_version limit 1";
 
-        public SqlDatabase(String theConnectionString)
-        {
+    public SqlDatabase(String theConnectionString)
+    {
             createConnection(theConnectionString: theConnectionString);
             Console.WriteLine("Connection String: " + connectionString);
             Console.WriteLine("Current Version: " + CurrentVersion);
         }
 
-        public SqlDatabase(Options options)
-        {
+    public SqlDatabase(Options options)
+    {
             createConnection(options: options);
             Console.WriteLine("Connection String: " + connectionString);
             Console.WriteLine("Current Version: " + CurrentVersion);
         }
 
-        private void createConnection(String theConnectionString = null, Options options = null)
-        {
+    private void createConnection(String theConnectionString = null, Options options = null)
+    {
             connectionString = theConnectionString;
 
             if (connectionString == null)
@@ -90,10 +90,10 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             connection.Open();
         }
 
-        public ScriptVersion CurrentVersion
+    public ScriptVersion CurrentVersion
+    {
+        get
         {
-            get
-            {
                 verify();
 
                 switch (getTableVersion())
@@ -110,8 +110,8 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
                 return new ScriptVersion(0, 0, 0, DateTime.MinValue, Environment.MachineName, "EMPTY DB");
             }
 
-            private set
-            {
+        private set
+        {
                 using (MySqlCommand cmd = connection.CreateCommand())
                 {
                     cmd.CommandText = INSERT_COMMAND;
@@ -124,10 +124,10 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
                     cmd.ExecuteNonQuery();
                 }
             }
-        }
+    }
 
-        private void verify()
-        {
+    private void verify()
+    {
             using (MySqlDataAdapter sql = new MySqlDataAdapter(TEST_CONNECTION_QUERY, connection))
             {
                 DataSet dataSet = new DataSet();
@@ -139,8 +139,8 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             }
         }
 
-        private VersionEnum getTableVersion()
-        {
+    private VersionEnum getTableVersion()
+    {
             try
             {
                 using (MySqlDataAdapter sql = new MySqlDataAdapter(TEST_TABLE_QUERY, connection))
@@ -164,8 +164,8 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             }
         }
 
-        private void createTable()
-        {
+    private void createTable()
+    {
             using (MySqlCommand cmd = connection.CreateCommand())
             {
                 cmd.CommandText = VERSION_TABLE_CREATE;
@@ -173,8 +173,8 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             }
         }
 
-        private void upgradeVersion2()
-        {
+    private void upgradeVersion2()
+    {
             using (MySqlCommand cmd = connection.CreateCommand())
             {
                 cmd.CommandText = VERSION_TABLE_UPGRADE_V2;
@@ -182,8 +182,8 @@ VALUES (@Major,@Minor,@Patch,@Modified,@MachineName,@Description)
             }
         }
 
-        private ScriptVersion readScriptVersion()
-        {
+    private ScriptVersion readScriptVersion()
+    {
              const String READ_QUERY = @"
 SELECT Major,Minor,Patch,Modified,MachineName,Description
 FROM db_version
@@ -204,8 +204,8 @@ order by Major desc, Minor desc, Patch desc
             }
         }
 
-        public List<ScriptVersion> getPatches(int major, int minor)
-        {
+    public List<ScriptVersion> getPatches(int major, int minor)
+    {
             const String READ_QUERY = @"
 SELECT Major,Minor,Patch,Modified,MachineName,Description
 FROM db_version
@@ -231,8 +231,8 @@ order by Patch
         }
         
 
-        public void apply(string content)
-        {
+    public void apply(string content)
+    {
             if (string.IsNullOrWhiteSpace(content)) return;
             
             connection.Execute(content);
@@ -240,17 +240,16 @@ order by Patch
             // script.Execute();
         }
 
-        public void updateVersion(ScriptVersion version)
-        {
+    public void updateVersion(ScriptVersion version)
+    {
             version.Date = DateTime.UtcNow;                                   // always use NOW as date of record
             CurrentVersion = version;
         }
 
-        public void Dispose()
-        {
+    public void Dispose()
+    {
             if (connection != null)
                 try { connection.Dispose(); } catch (Exception) { /*ignore*/ }
             connection = null;
         }
-    }
 }
