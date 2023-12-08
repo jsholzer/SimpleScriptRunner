@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 
-namespace SimpleScriptRunnerBto
+namespace SimpleScriptRunnerBto;
+
+public interface IScriptTarget
 {
-	public interface IScriptTarget
-	{
-		ScriptVersion CurrentVersion { get; }
-		List<ScriptVersion> getPatches(int major, int minor);
-	}
+	ScriptVersion CurrentVersion { get; }
+	List<ScriptVersion> getPatches(int major, int minor);
 }

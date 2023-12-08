@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleScriptRunnerBto.Util
+namespace SimpleScriptRunnerBto.Util;
+
+public static class ArgsUtil
 {
-    public static class ArgsUtil
+    public static DateTime? parseDate(this String[] args, params String[] keys)
     {
-        public static DateTime? parseDate(this String[] args, params String[] keys)
-        {
             String match = args.FirstOrDefault(x => TextHelper.startsWithAny(x, keys));
             if (match == null || !match.Contains("="))
                 return null;
@@ -16,20 +16,20 @@ namespace SimpleScriptRunnerBto.Util
             return Convert.ToDateTime(value);
         }
 
-        public static String[] parseSwitches(ref String[] args)
-        {
+    public static String[] parseSwitches(ref String[] args)
+    {
             String[] switches = args.Where(x => x.StartsWith("-")).ToArray();
             args = args.Where(x => !x.StartsWith("-")).ToArray();
             return switches;
         }
 
-        public static Dictionary<String, String> parseDictionary(ref String[] args)
-        {
+    public static Dictionary<String, String> parseDictionary(ref String[] args)
+    {
             return asDictionary(parseSwitches(ref args));
         }
 
-        public static Dictionary<String, String> asDictionary(String[] args, StringComparer comparer = null)
-        {
+    public static Dictionary<String, String> asDictionary(String[] args, StringComparer comparer = null)
+    {
             comparer = comparer ?? StringComparer.OrdinalIgnoreCase;
             Dictionary<String, String> result = new Dictionary<String, String>(comparer);
             foreach (String theKey in args)
@@ -52,8 +52,8 @@ namespace SimpleScriptRunnerBto.Util
             return result;
         }
 
-        public static String value(this Dictionary<String, String> switchDictionary, params String[] keys)
-        {
+    public static String value(this Dictionary<String, String> switchDictionary, params String[] keys)
+    {
             foreach (String key in keys)
             {
                 if (switchDictionary.ContainsKey(key))
@@ -62,23 +62,23 @@ namespace SimpleScriptRunnerBto.Util
             return null;
         }
 
-        public static int? valueInt(this Dictionary<String, String> switchDictionary, params String[] keys)
-        {
+    public static int? valueInt(this Dictionary<String, String> switchDictionary, params String[] keys)
+    {
             return TextHelper.parseIntNullable(value(switchDictionary, keys));
         }
 
-        public static long? valueLong(this Dictionary<String, String> switchDictionary, params String[] keys)
-        {
+    public static long? valueLong(this Dictionary<String, String> switchDictionary, params String[] keys)
+    {
             return TextHelper.parseLongNullable(value(switchDictionary, keys));
         }
 
-        public static double? valueDouble(this Dictionary<String, String> switchDictionary, params String[] keys)
-        {
+    public static double? valueDouble(this Dictionary<String, String> switchDictionary, params String[] keys)
+    {
             return TextHelper.parseDoubleNullable(value(switchDictionary, keys));
         }
 
-        public static bool? valueBool(this Dictionary<String, String> switchDictionary, params String[] keys)
-        {
+    public static bool? valueBool(this Dictionary<String, String> switchDictionary, params String[] keys)
+    {
             foreach (String key in keys)
             {
                 if (!switchDictionary.ContainsKey(key))
@@ -94,9 +94,8 @@ namespace SimpleScriptRunnerBto.Util
             return null;
         }
 
-        public static bool hasAny(this Dictionary<String, String> switchDictionary, params String[] keys)
-        {
+    public static bool hasAny(this Dictionary<String, String> switchDictionary, params String[] keys)
+    {
             return keys.Any(switchDictionary.ContainsKey);
         }
-    }
 }

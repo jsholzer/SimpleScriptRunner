@@ -1,8 +1,7 @@
-namespace SimpleScriptRunnerBto
+namespace SimpleScriptRunnerBto;
+
+public interface ITextScriptTarget : IScriptTarget
 {
-	public interface ITextScriptTarget : IScriptTarget
-	{
-        void apply(string content);
-        void updateVersion(ScriptVersion version);
-    }
+	void apply(string content);
+	void updateVersion(ScriptVersion version);
 }

@@ -6,12 +6,12 @@ using System.Linq;
 using System.Reflection;
 using SimpleScriptRunnerBto.Util;
 
-namespace SimpleScriptRunnerBto
+namespace SimpleScriptRunnerBto;
+
+public class TopProgram
 {
-    public class TopProgram
+    public static int main(NameValueCollection appSettings, string[] argArray_)
     {
-        public static int main(NameValueCollection appSettings, string[] argArray_)
-        {
             Options options = Options.build(argArray_);
             if (options.SqlFile)
                 return sqlFileMain(appSettings, options.Params.ToArray());
@@ -48,8 +48,8 @@ namespace SimpleScriptRunnerBto
             return result;
         }
 
-        public static int sqlFileMain(NameValueCollection appSettings, string[] argArray)
-        {
+    public static int sqlFileMain(NameValueCollection appSettings, string[] argArray)
+    {
             Dictionary<String, String> switches = ArgsUtil.parseDictionary(ref argArray);
             if (argArray.Length == 0)
             {
@@ -91,8 +91,8 @@ namespace SimpleScriptRunnerBto
             return result;
         }
 
-        public static int simpleScriptRunnerProgramMain(Options options)
-        {
+    public static int simpleScriptRunnerProgramMain(Options options)
+    {
             try
             {
                 Program.executeRelease(options);
@@ -105,9 +105,8 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        private static void writeMessage(string origin, string subcategory, Program.Category category, string code, string text)
-        {
+    private static void writeMessage(string origin, string subcategory, Program.Category category, string code, string text)
+    {
             Console.WriteLine("{0} : {1} {2} {3} : {4}", origin, subcategory, category, code, text);
         }
-    }
 }

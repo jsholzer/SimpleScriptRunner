@@ -4,33 +4,33 @@ using System.Linq;
 using SimpleScriptRunnerBto.Util;
 using System.Transactions;
 
-namespace SimpleScriptRunnerBto
+namespace SimpleScriptRunnerBto;
+
+public class Options
 {
-    public class Options
-    {
-        public bool RequireRollback { get; set; }
-        public bool UseTransactions { get; set; }
-        public long? MaxPatch { get; set; }
-        public bool SkipVersion { get; set; }
-        public bool SqlFile { get; set; }
-        public TimeSpan TransactionTimeout { get; set; }
-        public String SslMode { get; set; }
+    public bool RequireRollback { get; set; }
+    public bool UseTransactions { get; set; }
+    public long? MaxPatch { get; set; }
+    public bool SkipVersion { get; set; }
+    public bool SqlFile { get; set; }
+    public TimeSpan TransactionTimeout { get; set; }
+    public String SslMode { get; set; }
 
-        public String ServerName { get; set; }
-        public String DatabaseName { get; set; }
-        public String UserName { get; set; }
-        public String Password { get; set; }
+    public String ServerName { get; set; }
+    public String DatabaseName { get; set; }
+    public String UserName { get; set; }
+    public String Password { get; set; }
         
-        public String Path { get; set; }
-        public String[] Params { get; set; }
+    public String Path { get; set; }
+    public String[] Params { get; set; }
 
-        public Options()
-        {
+    public Options()
+    {
             TransactionTimeout = TransactionManager.DefaultTimeout;
         }
 
-        public void parseArgs(String[] argArray)
-        {
+    public void parseArgs(String[] argArray)
+    {
             argArray = argArray.ToArray();        // Copies so that caller is unchanged
             Dictionary<String, String> switches = ArgsUtil.parseDictionary(ref argArray);
 
@@ -56,8 +56,7 @@ namespace SimpleScriptRunnerBto
             SqlFile = switches.hasAny("-sqlfile", "--sqlfile", "-sf");
             SslMode = switches.value("--sslmode", "-sm");
 
-            double? timeoutValue = switches.valueDouble("-trantimeout", "--trantimeout", "-to");            // specified in minutes, fractional is fine 
-            if (timeoutValue.HasValue)
+            double? timeoutValue = switches.valueDouble("-trantimeout", "--trantimeout", "-to");            // specified in minutes, fractional is fine      if (timeoutValue.HasValue)
             {
                 // Validates that timeout against maximum value
                 TimeSpan timeout = TimeSpan.FromMinutes(timeoutValue.Value);            
@@ -76,11 +75,10 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        public static Options build(String[] argArray)
-        {
+    public static Options build(String[] argArray)
+    {
             Options options = new Options();
             options.parseArgs(argArray);
             return options;
         }
-    }
 }

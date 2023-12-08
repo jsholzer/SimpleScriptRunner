@@ -2,22 +2,22 @@ using System;
 using System.IO;
 using System.Transactions;
 
-namespace SimpleScriptRunnerBto
-{
-    public class NumberedTextScript : IScript<ITextScriptTarget>, IComparable
-    {
-        private readonly string path;
+namespace SimpleScriptRunnerBto;
 
-        public NumberedTextScript(FileInfo fileInfo, int major, int minor, long scriptNumber, string description)
-        {
+public class NumberedTextScript : IScript<ITextScriptTarget>, IComparable
+{
+    private readonly string path;
+
+    public NumberedTextScript(FileInfo fileInfo, int major, int minor, long scriptNumber, string description)
+    {
             path = fileInfo.FullName;
             Version = new ScriptVersion(major, minor, scriptNumber, fileInfo.LastWriteTime, Environment.MachineName, description);
         }
 
-        public ScriptVersion Version { get; private set; }
+    public ScriptVersion Version { get; private set; }
 
-        public void apply(ITextScriptTarget scriptTarget, Options options)
-        {
+    public void apply(ITextScriptTarget scriptTarget, Options options)
+    {
             var prevVersion = scriptTarget.CurrentVersion;
             var sql = File.ReadAllText(path);
             TransactionScope ts = null;
@@ -52,15 +52,14 @@ namespace SimpleScriptRunnerBto
             }
         }
 
-        public override string ToString()
-        {
+    public override string ToString()
+    {
             return path;
         }
 
-        public int CompareTo(object obj)
-        {
+    public int CompareTo(object obj)
+    {
             NumberedTextScript other = (NumberedTextScript)obj;
             return Version.CompareTo(other.Version);
         }
-    }
 }
